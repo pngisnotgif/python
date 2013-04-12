@@ -1,4 +1,5 @@
 # 6-8
+# I use dictionary instead of list in this exercise
 
 def num2english(n):
     num_dict = {
@@ -16,19 +17,21 @@ def num2english(n):
         11:'eleven',
         12:'twelve',
         13:'thirteen',
+        
         20:'twen',
         30:'thir',
         40:'for',
+        
         '15_50':'fif',
         '18_80':'eigh',
+        
         '<20':'teen',
         '>20':'ty',
+        
         '100':' hundred',
         '1000':' thousand'
         }
     
-    num_str = ''
-
     th = n / 1000
     hun = (n / 100) % 10
     ten = (n / 10) % 10
@@ -38,7 +41,9 @@ def num2english(n):
 
     # print th, hun, ten, ones, ten_ones
 
-    and_flag = False
+    num_str = ''
+
+    and_flag = False # flag for 'and' between thousand/hundred and tens or ones
     if th>0:
         num_str +=  num_dict[th] + num_dict['1000']
         and_flag = True
@@ -49,7 +54,7 @@ def num2english(n):
         num_str += num_dict[hun] + num_dict['100']
         and_flag = True
 
-    if ten > 1:
+    if ten > 1: # 20~99
         if and_flag:
             num_str += ' and '
         
@@ -65,12 +70,13 @@ def num2english(n):
             num_str += num_dict[20]
         else:
             num_str += num_dict[ten]
-        num_str += num_dict['>20']
+            
+        num_str += num_dict['>20']  # 'ty'
         
         if ones!=0:
             num_str += '-' + num_dict[ones]
             
-    elif ten_ones>13:
+    elif ten_ones>13:   # 14 ~ 19
         if and_flag:
             num_str += ' and '
             
@@ -80,11 +86,13 @@ def num2english(n):
             num_str += num_dict['18_80']
         else:
             num_str += num_dict[ones]
+            
         num_str += num_dict['<20']  # 'teen'
         
-    elif ten_ones<=13 and ten_ones!=0:     # <13
+    elif ten_ones<=13 and ten_ones!=0:     # 1 ~ 13
         if and_flag:
             num_str += ' and '
+            
         num_str += num_dict[ten_ones]
     else: # 0
         if th==0 and hun==0:
@@ -94,9 +102,11 @@ def num2english(n):
 
 
 if __name__ == '__main__':
-    for i in range(21):
+    for i in range(22):
         num2english(i)
+
     for i in [30, 31, 40, 41, 50, 51, 80, 81, 100, 101, 110, 120, 121, 199,
               200, 201, 210, 212, 219, 220, 345, 555, 1000, 1200,
-              2345, 9999, 2015, 2016, 2001, 2030, 3000]:
+              2345, 9999, 2015, 2016, 2001, 2030, 3000, 4320, 5005, 6606, 7074,
+              8218, 9517]:
         num2english(i)
