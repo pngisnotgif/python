@@ -12,7 +12,11 @@ def capital_reverse(s):
 
     print s,'==>',new_s
 
+def capital_reverse_v2(s):
+    print s,'==>',s.swapcase()
+    
 if __name__=='__main__':
     testcases = ['Mr.Ed', 'mR.eD', 'abc', '', ' ', 'aBc', 'A', 'AB']
     for i in testcases:
         capital_reverse(i)
+        capital_reverse_v2(i)
