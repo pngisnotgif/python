@@ -3,7 +3,8 @@
 
 import random
 
-debug = False
+debug = True
+# debug = False
 
 def Rochambeau(n):
     text = {0:'Cloth', 1:'Scissor', 2:'Stone'}
