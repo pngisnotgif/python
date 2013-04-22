@@ -46,9 +46,20 @@ def days_between(day1, day2):
         days += days_of_year_copy[m1] - d1
         for i in range(m1+1,12+1,1):
             days += days_of_year_copy[i]
-        days += (y2-y1-1) * days_of_common_year + (y2-y1-1)/4
-        # bug here, how many leap years between? 
 
+        # this method seems not so fast, but i can't think out a faster one now.
+        for i in range(y1+1, y2, 1):
+            days += days_of_common_year
+            if isLeapYear(i):
+                days += 1
+
+        '''
+        # days += (y2-y1-1) * days_of_common_year + (y2-y1-1)/4
+        
+        # bug here: (y2-y1-1)/4, it can't deal with the situatition 2003 ~ 2005.
+        # Is there any common and fast method calculating how many leap years between? 
+        '''
+        
         days_of_year_copy2 = copy.copy(days_of_year)
         # print days_of_year_copy2
         if isLeapYear(y2):
@@ -76,7 +87,7 @@ if __name__=='__main__':
                     ['1/1/2000', '1/1/2008'],
                     ['1/1/1983','1/1/2013'],
                     ['2/13/1983','4/21/2013'],
-                    ['1/1/1000','1/1/1900'],    # test leap year
+                    ['1/1/1000','1/1/1900'],    # test leap years between
                 ]
     for d1, d2 in test_days_between:
         print "Days between %s and %s : %d "%(d1, d2, days_between(d1, d2))
