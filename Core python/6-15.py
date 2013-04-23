@@ -1,6 +1,7 @@
 # 6-15
 
 import copy
+import time
 
 def dayStr_to_int(day):
     '''
@@ -27,7 +28,6 @@ def days_between(day1, day2):
     if y1==y2:  # same year
         if isLeapYear(y1):
             days_of_year[2] += 1
-            print 'Same year: Leap year %d'%(y1)
         if m1 != m2:
             days += days_of_year[m1] - d1
             for i in range(m1+1,m2,1):
@@ -40,8 +40,6 @@ def days_between(day1, day2):
             # or days_of_year may change accroding to days_of_year_copy
         if isLeapYear(y1):
             days_of_year_copy[2] += 1
-            print 'Leap year %d'%(y1)
-            # print days_of_year
             
         days += days_of_year_copy[m1] - d1
         for i in range(m1+1,12+1,1):
@@ -64,13 +62,36 @@ def days_between(day1, day2):
         # print days_of_year_copy2
         if isLeapYear(y2):
             days_of_year_copy2[2] += 1
-            print 'Leap year %d'%(y2)
         for i in range(1,m2,1):
             days += days_of_year_copy2[i]
         days += d2
 
     return days
     
+def get_next_birthday(date):
+    m, d, y = dayStr_to_int(date)
+  
+    today = time.strftime('%m/%d/%Y')   # get today's date, and set format
+    m0, d0, y0 = dayStr_to_int(today)
+ 
+    if isLeapYear(y) and  m==2 and d==29:   # birthday on Feb.29
+        if (m>m0 or (m==m0 and y>=y0)) and isLeapYear(y0):
+            next_year = y0
+        else:
+            found = False
+            next_year = y0
+            while(not found):
+                next_year += 1
+                if isLeapYear(next_year):
+                    found = True
+    else:   # common birthday
+        if m<m0 or (m==m0 and y<y0):
+            next_year = y0 + 1
+        else:
+            next_year = y0
+
+    next_birthday_str = str(m)+'/'+str(d)+'/'+str(next_year)
+    return next_birthday_str
 
 if __name__=='__main__':
     test_days_between = [
@@ -88,6 +109,21 @@ if __name__=='__main__':
                     ['1/1/1983','1/1/2013'],
                     ['2/13/1983','4/21/2013'],
                     ['1/1/1000','1/1/1900'],    # test leap years between
+                    ['1/1/1900', '1/1/1000'],   # test swap dates
                 ]
     for d1, d2 in test_days_between:
         print "Days between %s and %s : %d "%(d1, d2, days_between(d1, d2))
+
+    # calculate days till today
+    today = time.strftime('%m/%d/%Y')   # get today's date, and set format
+    test_birthday = [ '2/13/1983', '1/1/2000', '4/1/2013',  ]
+    for i in test_birthday:
+        print "Days from birthday %s to today is %d"%(i, days_between(i, today))
+ 
+    # calculate days till next birthday
+    test_birthdays = [ '1/1/2013', '2/28/2000', '2/29/2008', '5/1/2013',
+                       '2/29/2000', '5/1/2000', '4/23/2013'
+        ]
+    for i in test_birthdays:
+        next_birthday = get_next_birthday(i)
+        print "It will be %d days to next birthdate of %s."%(days_between(next_birthday,today),i)
