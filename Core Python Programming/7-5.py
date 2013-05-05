@@ -2,11 +2,13 @@
 
 # 7-5
 
+# v1.3 - encrypt user's password
 # v1.2 - add sub-menu: administrate(del account, and list users)
 # v1.1 - add timestamp
 # v1.0 - from example 7.1
 
 import time
+import hashlib
 
 db = {}
 
@@ -26,24 +28,31 @@ def newuser():
         else:
             break
     
-    pwd = raw_input('Passwd: ')
+    p = raw_input('Passwd: ')
     db[name] = {}
+
+    pwd = hashlib.md5(p).hexdigest()  # using md5 to generate password.
     db[name]['pwd'] = pwd
+    
     save_timestamp(name)
 
 def olduser():
     name = raw_input('Login: ')
-    pwd = raw_input('Passwd: ')
-    passwd = db[name].get('pwd')
-    if passwd == pwd:
-        print 'Welcome back,', name, '!'
-        if (time.time()- get_last_login_time(name)) < 4*60*60:  # less than 4 hours
-            print 'You already logged in at: %s.' \
-                  %(time.strftime('%x %X',time.localtime(get_last_login_time(name))))
-            # change timestamp in seconds since the epoch to 9-tuple, and then to string
-        save_timestamp(name)
+    p = raw_input('Passwd: ')
+    pwd = hashlib.md5(p).hexdigest()    # check password using md5
+    if name in db:
+        passwd = db[name].get('pwd')
+        if passwd == pwd:
+            print 'Welcome back,', name, '!'
+            if (time.time()- get_last_login_time(name)) < 4*60*60:  # less than 4 hours
+                print 'You already logged in at: %s.' \
+                      %(time.strftime('%x %X',time.localtime(get_last_login_time(name))))
+                # change timestamp in seconds since the epoch to 9-tuple, and then to string
+            save_timestamp(name)
+        else:
+            print 'Warning: passwd incorrect.'
     else:
-        print 'Warning: login or passwd incorrect.'
+        print 'Warning: login incorrect. '
     raw_input()
 
 def delUser():
@@ -92,6 +101,7 @@ Enter your choice: '''
     while not ret:
         try:
             choice = raw_input(prompt).strip()[0].lower()
+            # fix me: if two ENTER is pressed, an exception is raised here.
         except (EOFError, KeyboardInterrupt):
             choice = 'r'    # how to directly return to showmenu()?
 
