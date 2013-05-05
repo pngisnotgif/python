@@ -2,6 +2,8 @@
 
 # 7-5
 
+# v1.6 - merge newuser() and olduser();
+#        fix bug: empty choice string causes exception
 # v1.5 - abandon signs and whitespaces for name
 # v1.4 - ignore case of name
 # v1.3 - encrypt user's password
@@ -39,15 +41,19 @@ def check_and_lower_name(prompt):
         if check_name(name):
              name_legal = True
         else:
-            print 'Warning: no signs and space is allowed.'
+            print 'Warning: no signs and space are allowed.'
 
     return name.lower()
     
-def newuser():
+def newuser(name):
+    first_time = True
+    
     prompt = 'Login desired(ignore case): '
     while True:
-        name = check_and_lower_name(prompt)
-            
+        if not first_time:
+            name = check_and_lower_name(prompt)
+
+        first_time = False            
         if db.has_key(name):
             prompt = 'Warning: name taken, try another login: '
             continue
@@ -62,25 +68,40 @@ def newuser():
     
     save_timestamp(name)
 
-def olduser():
-    prompt = 'Login: '
-    name = check_and_lower_name(prompt)
-    
+def olduser(name):
     p = raw_input('Passwd: ')
     pwd = hashlib.md5(p).hexdigest()    # check password using md5
-    if name in db:
-        passwd = db[name].get('pwd')
-        if passwd == pwd:
-            print 'Welcome back,', name, '!'
-            if (time.time()- get_last_login_time(name)) < 4*60*60:  # less than 4 hours
-                print 'You already logged in at: %s.' \
-                      %(time.strftime('%x %X',time.localtime(get_last_login_time(name))))
-                # change timestamp in seconds since the epoch to 9-tuple, and then to string
+    passwd = db[name].get('pwd')
+    if passwd == pwd:
+        print 'Welcome back,', name, '!'
+        if (time.time()- get_last_login_time(name)) < 4*60*60:  # less than 4 hours
+            print 'You already logged in at: %s.' \
+                  %(time.strftime('%x %X',time.localtime(get_last_login_time(name))))
+            # change timestamp in seconds since the epoch to 9-tuple, and then to string
+
             save_timestamp(name)
-        else:
-            print 'Warning: passwd incorrect.'
     else:
-        print 'Warning: no such an account. '
+        print 'Warning: passwd incorrect.'
+
+def login():
+    prompt = 'Login: '
+
+    done = False
+    while not done:
+        name = check_and_lower_name(prompt)
+
+        if name not in db:
+            print 'No such an account.'
+            choice = raw_input('Will you register a new user? (Y/N) ').strip().lower()
+            if choice == 'y':
+                newuser(name)
+                done = True
+            else:
+                print 'Re-enter the account:'
+        else:
+            olduser(name)
+            done = True
+        
     raw_input()
 
 def delUser():
@@ -130,9 +151,10 @@ Enter your choice: '''
     while not ret:
         try:
             choice = raw_input(prompt).strip()[0].lower()
-            # fix me: if two ENTER is pressed, an exception is raised here.
         except (EOFError, KeyboardInterrupt):
-            choice = 'r'    # how to directly return to showmenu()?
+            choice = 'r'
+        except IndexError:
+            continue
 
         print 'You picked: [%s]'%choice
         if choice not in 'dlr':
@@ -151,8 +173,7 @@ def showmenu():
     prompt ="""
         MENU
       ========
-(N)ew User Login
-(E)xisting User Login
+(S)ign in
 (A)dministrate
 (Q)uit
 
@@ -166,10 +187,12 @@ Enter choice: """
                 choice = raw_input(prompt).strip()[0].lower()
             except (EOFError, KeyboardInterrupt):
                 choice = 'q'
+            except IndexError:
+                continue
                 
             print 'You picked: [%s]'%choice
             
-            if choice not in 'neqa':
+            if choice not in 'saq':
                 print 'Warning: invalid option, try again.'
                 raw_input()
             else:
@@ -178,10 +201,8 @@ Enter choice: """
         if choice == 'q':
             done = True
             print 'Bye!'
-        if choice == 'n':
-            newuser()
-        if choice == 'e':
-            olduser()
+        if choice == 's':
+            login()
         if choice == 'a':
             administrate()
 
