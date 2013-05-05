@@ -9,8 +9,8 @@ import time
 
 db = {}
 
-def save_timestamp():
-    db['timestrmp'] = time.time()
+def save_timestamp(name):
+    db[name]['timestamp'] = time.time()
     
 def newuser():
     prompt = 'Login desired: '
@@ -23,20 +23,21 @@ def newuser():
             break
     
     pwd = raw_input('Passwd: ')
-    db[name] = pwd
-    save_timestamp()
+    db[name] = {}
+    db[name]['pwd'] = pwd
+    save_timestamp(name)
 
 def olduser():
     name = raw_input('Login: ')
     pwd = raw_input('Passwd: ')
-    passwd = db.get(name)
+    passwd = db[name].get('pwd')
     if passwd == pwd:
         print 'Welcome back,', name, '!'
-        if (time.time()- db['timestrmp'])<4*60*60:  # less than 4 hours
+        if (time.time()- db[name]['timestrmp']) < 4*60*60:  # less than 4 hours
             print 'You already logged in at: %s.' \
-                  %(time.strftime('%x %X',time.localtime(db['timestrmp'])))
+                  %(time.strftime('%x %X',time.localtime(db[name]['timestamp'])))
             # change timestamp in seconds since the epoch to 9-tuple, and then to string
-        save_timestamp()
+        save_timestamp(name)
     else:
         print 'Warning: login or passwd incorrect.'
     raw_input()
