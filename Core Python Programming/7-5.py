@@ -2,10 +2,13 @@
 
 # 7-5
 
+# v1.4 - ignore case of name
 # v1.3 - encrypt user's password
 # v1.2 - add sub-menu: administrate(del account, and list users)
 # v1.1 - add timestamp
 # v1.0 - from example 7.1
+
+# TODO: using Tkinter to make an UI.
 
 import time
 import hashlib
@@ -19,9 +22,9 @@ def get_last_login_time(name):
     return db[name]['timestamp']
     
 def newuser():
-    prompt = 'Login desired: '
+    prompt = 'Login desired(ignore case): '
     while True:
-        name = raw_input(prompt)
+        name = raw_input(prompt).lower()
         if db.has_key(name):
             prompt = 'Warning: name taken, try another login: '
             continue
@@ -37,7 +40,7 @@ def newuser():
     save_timestamp(name)
 
 def olduser():
-    name = raw_input('Login: ')
+    name = raw_input('Login: ').lower()
     p = raw_input('Passwd: ')
     pwd = hashlib.md5(p).hexdigest()    # check password using md5
     if name in db:
@@ -58,7 +61,7 @@ def olduser():
 def delUser():
     if db.keys():
         prompt = 'Login to be deleted: '
-        name = raw_input(prompt)
+        name = raw_input(prompt).lower()
         if name in db:
             print 'Detail of %s: \n'%(name), db[name]
             confirm = raw_input('Delete this account? Y or N? ').strip().lower()
