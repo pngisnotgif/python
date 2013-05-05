@@ -2,6 +2,7 @@
 
 # 7-5
 
+# v1.5 - abandon signs and whitespaces for name
 # v1.4 - ignore case of name
 # v1.3 - encrypt user's password
 # v1.2 - add sub-menu: administrate(del account, and list users)
@@ -12,6 +13,7 @@
 
 import time
 import hashlib
+import string
 
 db = {}
 
@@ -20,11 +22,32 @@ def save_timestamp(name):
 
 def get_last_login_time(name):
     return db[name]['timestamp']
+
+def check_name(name):
+    legal_chars = string.digits + string.letters 
+    
+    for c in name:
+        if c not in legal_chars:
+            return False
+
+    return True
+
+def check_and_lower_name(prompt):
+    name_legal = False
+    while not name_legal:
+        name = raw_input(prompt)
+        if check_name(name):
+             name_legal = True
+        else:
+            print 'Warning: no signs and space is allowed.'
+
+    return name.lower()
     
 def newuser():
     prompt = 'Login desired(ignore case): '
     while True:
-        name = raw_input(prompt).lower()
+        name = check_and_lower_name(prompt)
+            
         if db.has_key(name):
             prompt = 'Warning: name taken, try another login: '
             continue
@@ -40,7 +63,9 @@ def newuser():
     save_timestamp(name)
 
 def olduser():
-    name = raw_input('Login: ').lower()
+    prompt = 'Login: '
+    name = check_and_lower_name(prompt)
+    
     p = raw_input('Passwd: ')
     pwd = hashlib.md5(p).hexdigest()    # check password using md5
     if name in db:
@@ -55,13 +80,14 @@ def olduser():
         else:
             print 'Warning: passwd incorrect.'
     else:
-        print 'Warning: login incorrect. '
+        print 'Warning: no such an account. '
     raw_input()
 
 def delUser():
     if db.keys():
         prompt = 'Login to be deleted: '
-        name = raw_input(prompt).lower()
+        name = check_and_lower_name(prompt)      
+                
         if name in db:
             print 'Detail of %s: \n'%(name), db[name]
             confirm = raw_input('Delete this account? Y or N? ').strip().lower()
@@ -79,7 +105,7 @@ def delUser():
 def listAllUser():
     if db.keys():
         for user in db:
-            print 'name:', user,
+            print 'name:', user,',',
             print 'password:', db[user]['pwd']
     else:
         print 'No accounts.'
