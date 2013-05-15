@@ -1,0 +1,8 @@
+# test
+This is an example file for 9-1.
+
+# This is a comment.
+	# This is another comment.
+#
+   1
+ # a space before '#'
