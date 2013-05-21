@@ -28,7 +28,7 @@ def test_printf():
         if len(i)==1:
             printf(i[0])
         elif len(i)==0:
-            printf('')
+            printf(None)
         else:
             printf(i[0],*i[1:]) # an asterisk: '&' should be used before tuple
         
