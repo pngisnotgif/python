@@ -2,23 +2,28 @@
 
 # def timeit(func, times, *nkwargs, **kwargs):
 # how to run many times? using times as a default parameter.
-# and how to call timeit()? 
-def timeit(func, *nkwargs, **kwargs):
-    import time
-    
-    start_time = time.clock()
-    try:
-        # for i in range(times):
-        #     retval = func( *nkwargs, **kwargs )
-        retval = func( *nkwargs, **kwargs )
-        
-        end_time = time.clock()
-        elapse_time = end_time - start_time
-        result = (retval, elapse_time)
-    except Exception, diag:
-        result = (False, str(diag))
+# and how to call timeit()?
 
-    return result
+import time
+
+def timeit(times=1):
+
+    def wrap( func, *nkwargs, **kwargs):
+        start_time = time.time()
+        try:
+            for i in range(times):
+                retval = func( *nkwargs, **kwargs )
+            
+            end_time = time.time()
+            elapse_time = end_time - start_time
+
+            result = (retval, elapse_time)
+        except Exception, diag:
+            result = ('Error:', str(diag))
+
+        return result
+
+    return wrap
 
 def test_time():
     funcs = (int, long, float)
@@ -27,11 +32,12 @@ def test_time():
     for eachfunc in funcs:
         print '-'*20
         for eachvalue in values:
-            # result = timeit( eachfunc, eachvalue, times=10000 )
-            result = timeit( eachfunc, eachvalue )
+            result = timeit(10000)( eachfunc, eachvalue )   # notice the form of parameters.
+            # result = timeit()( eachfunc, eachvalue )   # use the default parameter times.
             
-            if result[0] != False:
-                print '%s(%s)=%s, Elapse time: %s secs.'\
+            
+            if result[0] != 'Error:':
+                print '%s(%s)=%s, Elapse time: %.4f secs.'\
                       %(eachfunc.__name__, repr(eachvalue), result[0], result[1])
                 # note: eachfunc is a type<int> like variable.
                 # Use __name__ to print its name.
