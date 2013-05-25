@@ -1,9 +1,5 @@
 # 11-12
 
-# def timeit(func, times, *nkwargs, **kwargs):
-# how to run many times? using times as a default parameter.
-# and how to call timeit()?
-
 import time
 
 def timeit(times=1):
