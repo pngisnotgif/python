@@ -4,23 +4,31 @@ import time
 
 def timeit(times=1):
 
-    def wrap( func, *nkwargs, **kwargs):
-        start_time = time.time()
-        try:
-            for i in range(times):
-                retval = func( *nkwargs, **kwargs )
-            
-            end_time = time.time()
-            elapse_time = end_time - start_time
+    def wrap( func ):
+        def _wrap(*nkwargs, **kwargs):
+            start_time = time.time()
+            try:
+                for i in range(times):
+                    retval = func( *nkwargs, **kwargs )
+                
+                end_time = time.time()
+                elapse_time = end_time - start_time
 
-            result = (retval, elapse_time)
-        except Exception, diag:
-            result = ('Error:', str(diag))
+                result = (retval, elapse_time)
+            except Exception, diag:
+                result = ('Error:', str(diag))
 
-        return result
-
+            return result
+        return _wrap
     return wrap
 
+times = 20000
+
+# use decorator
+@timeit(times)
+def test(func, value):
+    return func(value)
+    
 def test_time():
     funcs = (int, long, float)
     values = (1234, 12.34, '1234', '12.34')
@@ -28,9 +36,7 @@ def test_time():
     for eachfunc in funcs:
         print '-'*20
         for eachvalue in values:
-            result = timeit(10000)( eachfunc, eachvalue )   # notice the form of parameters.
-            # result = timeit()( eachfunc, eachvalue )   # use the default parameter times.
-            
+            result = test( eachfunc, eachvalue )   # notice the form of parameters.          
             
             if result[0] != 'Error:':
                 print '%s(%s)=%s, Elapse time: %.4f secs.'\
