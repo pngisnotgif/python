@@ -2,6 +2,7 @@
 
 # 7-5, and 9-12
 
+# v1.7.1 - use shelve to save db
 # v1.7 - add admin account support, and save db in pickle
 # v1.6 - merge newuser() and olduser()
 #        fix bug: empty choice string causes exception
@@ -18,10 +19,15 @@ import time
 import hashlib
 import string
 import pickle
+import shelve
 
-db = {}
-db_filename = 'login.pkl'
+db_filename = 'login'   # will be save as login.db using shelve
+db = shelve.open( db_filename )
+
 def loadDB():
+    pass
+    # using shelve does not need to do so
+'''    
     global db
     try:
         db_file = open(db_filename,'r')
@@ -32,12 +38,16 @@ def loadDB():
     if db_file:
         db = pickle.load(db_file)
         db_file.close()
+'''
 
 def saveDB():
     global db
+    db.close()
     
+    '''
     db_file = open(db_filename,'w')
     pickle.dump(db, db_file, pickle.HIGHEST_PROTOCOL)
+    '''
 
 def save_timestamp(name):
     db[name]['timestamp'] = time.time()
@@ -159,7 +169,7 @@ def listAllUser():
     if db.keys():
         for user in db:
             print 'name:', user,',',
-            print 'password:', db[user]['pwd']
+            print 'password:', db[user]['pwd']  # FIX ME: shelve cannot read pwd, raising KeyError Exception.
     else:
         print 'No accounts.'
     raw_input()
