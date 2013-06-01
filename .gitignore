@@ -1,3 +1,6 @@
 *.bak
 .DS_Store
 *.pyc
+
+# generated files
+9-19.bin
