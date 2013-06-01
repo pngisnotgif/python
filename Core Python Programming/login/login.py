@@ -2,7 +2,7 @@
 
 # 7-5, and 9-12
 
-# v1.7 - add admin account support
+# v1.7 - add admin account support, and save db in pickle
 # v1.6 - merge newuser() and olduser()
 #        fix bug: empty choice string causes exception
 # v1.5 - abandon signs and whitespaces for name
@@ -17,8 +17,27 @@
 import time
 import hashlib
 import string
+import pickle
 
 db = {}
+db_filename = 'login.pkl'
+def loadDB():
+    global db
+    try:
+        db_file = open(db_filename,'r')
+    except IOError:
+        print 'open file %s failed.'%(db_filename)
+        return
+    
+    if db_file:
+        db = pickle.load(db_file)
+        db_file.close()
+
+def saveDB():
+    global db
+    
+    db_file = open(db_filename,'w')
+    pickle.dump(db, db_file, pickle.HIGHEST_PROTOCOL)
 
 def save_timestamp(name):
     db[name]['timestamp'] = time.time()
@@ -40,11 +59,20 @@ def check_and_lower_name(prompt):
     while not name_legal:
         name = raw_input(prompt)
         if check_name(name):
-             name_legal = True
+            name_legal = True
         else:
             print 'Warning: no signs and space are allowed.'
 
     return name.lower()
+
+admin_name = 'admin'
+admin_init_pwd = 'admin'
+def check_and_create_admin():
+    if not db.has_key(admin_name):
+        db[admin_name]={}
+        pwd = hashlib.md5( admin_init_pwd ).hexdigest()
+        db[admin_name]['pwd'] = pwd
+        save_timestamp(admin_name)    
     
 def newuser(name):
     first_time = True
@@ -111,13 +139,16 @@ def delUser():
         name = check_and_lower_name(prompt)      
                 
         if name in db:
-            print 'Detail of %s: \n'%(name), db[name]
-            confirm = raw_input('Delete this account? Y or N? ').strip().lower()
-            if confirm == 'y':
-                del db[name]
-                print 'Account: %s is deleted.'%(name)
+            if name == 'admin':
+                print 'admin could not been deleted.'
             else:
-                print 'No account is deleted.'
+                print 'Detail of %s: \n'%(name), db[name]
+                confirm = raw_input('Delete this account? Y or N? ').strip().lower()
+                if confirm == 'y':
+                    del db[name]
+                    print 'Account: %s is deleted.'%(name)
+                else:
+                    print 'No account is deleted.'
         else:
             print 'No such an account.'
     else:
@@ -208,4 +239,7 @@ Enter choice: """
             administrate()
 
 if __name__=='__main__':
+    loadDB()
+    check_and_create_admin()
     showmenu()
+    saveDB()
