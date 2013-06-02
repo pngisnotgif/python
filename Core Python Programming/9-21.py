@@ -10,13 +10,13 @@ txtfile = glob.glob('*.txt')
 out_dir = '9-21'
 
 def compress_all_py(file_list):
-    f_out = zipfile.ZipFile(zip_file_name,'w')
+    f_out = zipfile.ZipFile(zip_file_name,'w',zipfile.ZIP_DEFLATED )
     for f in file_list:
         f_out.write(f)
     f_out.close()
 
 def append_arch(filename):
-    f_out = zipfile.ZipFile(zip_file_name,'a')
+    f_out = zipfile.ZipFile(zip_file_name,'a',zipfile.ZIP_DEFLATED )
     f_out.write(filename)
     f_out.close()
 
