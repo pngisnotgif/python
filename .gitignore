@@ -2,7 +2,9 @@
 .DS_Store
 *.pyc
 *.gz
+*.zip
 
 # generated files
 9-19.bin
 9-20/
+9-21/
