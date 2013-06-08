@@ -42,9 +42,13 @@ class Line(object):
     line class
     '''
 
-    def __init__(self, start_point=Point(), end_point=Point()):
-        print 'Line.__init__ called.'
+    def __init__(self, start_point=None, end_point=None):
+        print 'Line.__init__ is calling.'
+        if start_point is None:
+            start_point = Point()
         self.start = start_point
+        if end_point is None:
+            end_point = Point()
         self.end = end_point
 
     def __str__(self):    
