@@ -77,6 +77,16 @@ def test_line():
 
     line2 = Line(Point(1,2),Point(3,4)) # Line((1,2),(3,4)) is wrong: \
                 # AttributeError: 'tuple' object has no attribute 'get_x'
+                # 
+                # We may use collections.namedtuple() as:
+                #
+                # Point = collecitons.namedtuple('Point', 'x y')
+                # point_a = Point(1,2)
+                # 
+                # Or:
+                # class Point(collections.namedtuple('Point', 'x y')):
+                # ...w
+                 
     print line2
     
 if __name__=='__main__':
