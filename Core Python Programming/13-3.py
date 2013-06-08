@@ -1,16 +1,4 @@
 # 13-3
-
-def group(value):
-    if isinstance(value, str):
-        s = value
-        point = s.find('.')
-        if point>3:
-            pos = point
-            while(pos>0):
-                pos = pos - 3
-                s = s[:pos] + ', ' + s[pos:]
-    else:
-        raise TypeError, 'Wrong type of parameter value'
     
 class MoneyFmt(object):
     '''
