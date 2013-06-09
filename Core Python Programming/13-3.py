@@ -5,7 +5,7 @@ class MoneyFmt(object):
         A class deals with money format.
     '''
     
-    def __init__(self, value):
+    def __init__(self, value=0):
         if isinstance(value, (float,int)):  # should be float or integer
             self.__data = value
         else:
@@ -18,10 +18,6 @@ class MoneyFmt(object):
         else:
             s = '-${:,.2f}'.format(abs(self.__data))
         
-        #s = "$%.2f"%(self.__data)
-        #if grouping:
-        #    s = group(s)
-        
         return s
 
     __str__ = dollarize
@@ -29,7 +25,7 @@ class MoneyFmt(object):
     def __repr__(self):
         return repr(self.__data)
 
-    def update(self, newvalue):
+    def update(self, newvalue=0):
         if isinstance(newvalue, (float, int)):
             self.__data = newvalue
         else:
