@@ -57,7 +57,8 @@ class mytime(object):
         print time_str
 
     @classmethod
-    def show_format(self):
+    def show_format(cls):   # note: parameter is cls
+        # print cls
         print 'format : date string'
         print '-'*20
         for i in mytime.format_dict:
