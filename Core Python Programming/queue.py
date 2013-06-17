@@ -1,29 +1,30 @@
 # 13-9
 
-class queue(object):
+class queue(list):
+    '''
+        queue class inherited from list.
+    '''
 
-    q_list = []
-
+    def __len__(self):
+        return super(queue, self).__len__()
+    
     def enqueue(self, element):
-        self.q_list.append(element)
+        self.append(element)
 
     def dequeue(self):
-        l = len(self.q_list)
+        l = len(self)
 
         if l>0:
-            element = self.q_list[0]
-            del self.q_list[0]
+            element = self[0]
+            del self[0]
         else:
             print 'Empty queue.'
-            element = None
+            element = []
             
         return element
 
     def display(self):
-        print 'Dump of queue:'
-        for i in self.q_list:
-            print i,
-        print
+        print self
 
 
 def test_queue():
@@ -35,7 +36,8 @@ def test_queue():
     q.display()
     
     q.dequeue()
-    q.display()
+    print q
+    
     q.dequeue()
     q.dequeue()
     q.display()
