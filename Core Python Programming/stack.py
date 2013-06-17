@@ -1,50 +1,51 @@
 # 13-8
 
-class stack(object):
-
-    stacks = []
+class stack(list):
+    '''
+        stack class inherited from list
+    '''
     
     def push(self, element):
         if element:
-            self.stacks.append(element)
+            self.append(element)
 
     def pop(self):
-        if 'pop' in dir(self.stacks):
+        if 'pop' in dir(stack.__base__):
             print 'Using builtin pop()'
             try:
-                element = self.stacks.pop()
+                element = super(stack,self).pop()   # must use super, otherwise looping forever here.
             except IndexError:
-                element = None
+                element = []
                 
             return element
         else:
             print 'Using my pop()'
-            l = len(self.stacks)
+            l = len(self)
             if l>0:
-                element = self.stacks[l-1]
-                del self.stacks[l-1]
+                element = self[l-1]
+                del self[l-1]
                 return element
             else:
-                return None
+                return []
 
+    def __len__(self):
+        return super(stack, self).__len__()
+    
     def isempty(self):
-        return len(self.stacks)==0
+        return len(self)==0
 
     def peek(self):
         'get item of top of stack, without deleting it.'
         
-        l = len(self.stacks)
+        l = len(self)
         if l>0:
-            element = self.stacks[l-1]
+            element = self[l-1]
             return element
         else:
-            return None
+            return []
 
     def display(self):
-        print 'Stack:'
-        for i in self.stacks:
-            print i,
-        print
+        print self
 
 def test_stack():
     s = stack()
@@ -53,14 +54,15 @@ def test_stack():
 
     s.push(['2'])
     s.display()
+    print 'length of s:',len(s)
 
-    # print s[:] # need slice operator
+    print 'using slice s[:]:', s[:] # need slice operator
 
     s.pop()
     s.display()
 
     print 'Top item of stack:',s.peek()
-    s.display()
+    print s # equals to s.display()
 
     print s.isempty()
 
@@ -71,7 +73,6 @@ def test_stack():
     s.pop()
     print s.peek()
     
-
     
 if __name__=='__main__':
     test_stack()
