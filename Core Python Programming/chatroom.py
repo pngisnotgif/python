@@ -60,6 +60,8 @@ class User(object):
             self.messages[room] = []
         self.messages[room].append(msg)
         print "{} says '{}' to {}.".format(self, words, listener)
+        if listener=='all':
+            room.broadcast(self, words)
 
         # print 'type of msg: %r'%(type(msg))
         # print 'msg=%s'%msg
@@ -83,12 +85,27 @@ class Ad(object):
         Advertisement class
     '''
 
-    def __init__(self):
-        self.ad = 'This is an ad.'
+    def __init__(self, ad = None):
+        if ad is None:
+            self.ad = 'This is an ad.'
+        else:
+            self.ad = ad
 
+    def __str__(self):
+        return self.ad
+
+class AdPresenter(object):
+
+    ad_list = ['Python supported this chatroom.',
+               'Github stored source code.',
+               'Programs written with Mac Air.',
+               'Lenovo also supperted all the work.']
+    
     def show(self):
-        print self.ad
-        
+        ad_content = str(random.sample(self.ad_list,1)[0])
+        ad = Ad(ad_content)
+        print ad
+    
 
 class Room(object):
 
@@ -105,11 +122,18 @@ class Room(object):
             self.name = 'rm' + str(self.rooms)
 
         self.perm = {}
+        self.usrs = []
+        self.ad = AdPresenter()
 
         print 'Room "%s" is created.'%(rm_name)
 
     def __str__(self):
         return 'Room %s'%(self.name)
+
+    def join(self, user):
+        print "User %s joined in room %s"%(user, self)
+        if user not in self.usrs:
+            self.usrs.append(user)
    
     def invite(self, inviter, invitee):
         "Invite someone to this room"
@@ -119,18 +143,32 @@ class Room(object):
         'record accepted permission'
         self.perm[inviter] = invitee
         self.perm[invitee] = inviter
+        
+        self.join(invitee)  # add invitee to user list
 
     def get_permission(self, user1, user2):
         if user1 in self.perm.keys() or user2 in self.perm.keys():
             return True
         else:
-            return False
+            return False        
+    
+    def display_all_messages(self):pass # should list in time order
 
-    def display_all_messages(self):pass
+    def display_all_users(self):
+        print 'Users in %s: '%(self),
+        for user in self.usrs:
+            print user,',',
+        print
 
-    def display_all_users(self):pass
+    def broadcast(self, user, words):
+        print 'user %s broadcasting to EVERYONE:'%(user)
+        for i in self.usrs:
+            if i != user:
+                user.say(i,words,self)
 
-    def broadcast(self, user): pass
+    def showAD(self):
+        print "AD time in '%s':"%(self),
+        self.ad.show()
 
     def __del__(self):
         self.rooms -= 1
@@ -138,13 +176,16 @@ class Room(object):
 # user_decision = {0:decline, 1:accept} # how to call method in class?
 
 def user_random_decision(user1, user2, rm):
+    "user1 decide whether accpet user2's invitation."
+    
     # decision = random.randint(0,1)
     decision = 1
+    
     if decision==0:
         user1.decline(rm, user2)
     else:
         user1.accept(rm, user2)
-        rm.add_permission(user1, user2)
+        rm.add_permission(user2, user1)
 
 def test_chatroom():
     p1 = User('Jerry')
@@ -155,8 +196,11 @@ def test_chatroom():
     rm1 = Room('hello chatroom!')
 
     time.sleep(1)
+
+    rm1.join(p1)    # p1 joined room 'rm1'
+    
     rm1.invite(p1, p2)
-    user_random_decision(p1, p2, rm1)
+    user_random_decision(p2, p1, rm1)
     if rm1.get_permission(p1, p2):
         p1.say(p2,"Hello "+str(p2),rm1)
         time.sleep(1)
@@ -166,8 +210,42 @@ def test_chatroom():
         # p1.show_messages(rm1)
         # p2.show_messages(rm1)
         p1.show_all_messages()
+        rm1.display_all_users()
+        
+        time.sleep(1)
+        rm1.showAD()
 
- 
+    print
+    time.sleep(1)
+    p3 = User('Violet')
+    rm1.invite(p2,p3)
+    user_random_decision(p3, p2, rm1)
+    if rm1.get_permission(p1, p2):
+        p2.say(p3, "welcome, "+str(p3), rm1)
+        time.sleep(1)
+        p3.say(p2, "Thanks for inviting me.", rm1)
+
+        time.sleep(1)
+        p2.show_all_messages()
+        rm1.display_all_users()
+        
+        time.sleep(1)
+        rm1.showAD()
+
+    print
+    time.sleep(1)
+    rm2 = Room('rm2')
+    rm2.join(p3)
+    rm2.join(p1)
+    time.sleep(1)
+    p1.say(p3, "It's good to see you here. "+str(p3), rm2)
+    rm2.display_all_users()
+    
+    time.sleep(1)
+    rm2.showAD()
+
+    print
+    p1.say('all', "How are you everyone?", rm1)
     
     
 
