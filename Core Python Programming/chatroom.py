@@ -61,6 +61,10 @@ class User(object):
             If room is None, chat in current room.
         '''
 
+        if listener != 'all' and listener not in room.get_user_list():
+            print "WARN: %s is not allowed to talk to %s: %s"%(self, listener, words)
+            return
+
         msg = Message(msg = words, sent = self, rec = listener)
         if room not in self.messages:
             self.messages[room] = []
@@ -133,7 +137,6 @@ class Room(object):
         else:
             self.name = 'rm' + str(self.rooms)
 
-        self.perm = {}  # permit list for talking to others
         self.usrs = []  # user lists of this room
         self.ad = AdPresenter() # ads in this room
 
@@ -142,6 +145,9 @@ class Room(object):
 
     def __str__(self):
         return 'Room %s'%(self.name)
+
+    def get_user_list(self):
+        return self.usrs
 
     def join(self, user):
         "a new user joins in this room"
@@ -155,22 +161,6 @@ class Room(object):
         "a user invites someone to this room"
         
         inviter.invite(self.name, invitee)
-
-    def add_permission(self, inviter, invitee):
-        'record accepted permission'
-        
-        self.perm[inviter] = invitee
-        self.perm[invitee] = inviter
-        
-        self.join(invitee)  # add invitee to user list
-
-    def get_permission(self, user1, user2):
-        "Check if user1 has permission talking with user2"
-        
-        if user1 in self.perm.keys() or user2 in self.perm.keys():
-            return True
-        else:
-            return False        
     
     def display_all_messages(self):
         "Display all messages in this room according to time order."
@@ -188,7 +178,12 @@ class Room(object):
         # print in time order
         for m in sorted(msgs, key=lambda x:x.time):
             t = time.ctime(m.time).split()[3] # extract time from timestamp
-            print t,m
+            print '  ',t,m,
+            if m.broadcast:
+                print '(BROADCAST)'
+            else:
+                print
+        print
 
     def display_all_users(self):
         print 'Users in %s: '%(self),
@@ -220,7 +215,7 @@ class Room(object):
 # user_decision = {0:decline, 1:accept} # how to call method in class?
 
 def user_random_decision(user1, user2, rm):
-    "user1 decide whether accpet user2's invitation."
+    "user1 decides whether to accpet user2's invitation."
     
     # decision = random.randint(0,1)
     decision = 1
@@ -229,7 +224,7 @@ def user_random_decision(user1, user2, rm):
         user1.decline(rm, user2)
     else:
         user1.accept(rm, user2)
-        rm.add_permission(user2, user1)
+        rm.join(user1)
 
 def test_chatroom():
     p1 = User('Jerry')
@@ -240,28 +235,28 @@ def test_chatroom():
     
     rm1.invite(p1, p2)
     user_random_decision(p2, p1, rm1)
-    if rm1.get_permission(p1, p2):
-        p1.say(p2,"Hello "+str(p2),rm1)
-        p2.say(p1, "Hi,"+str(p1),rm1)
+    
+    p1.say(p2,"Hello "+str(p2),rm1)
+    p2.say(p1, "Hi,"+str(p1),rm1)
 
-        p1.show_messages(rm1)
-        p1.show_all_messages()
-        rm1.display_all_users()
-        
-        rm1.showAD()
+    p1.show_messages(rm1)
+    p1.show_all_messages()
+    rm1.display_all_users()
+    
+    rm1.showAD()
 
     print
     p3 = User('Violet')
     rm1.invite(p2,p3)
     user_random_decision(p3, p2, rm1)
-    if rm1.get_permission(p1, p2):
-        p2.say(p3, "welcome, "+str(p3), rm1)
-        p3.say(p2, "Thanks for inviting me.", rm1)
+    
+    p2.say(p3, "welcome, "+str(p3), rm1)
+    p3.say(p2, "Thanks for inviting me.", rm1)
 
-        p2.show_all_messages()
-        rm1.display_all_users()
-        
-        rm1.showAD()
+    p2.show_all_messages()
+    rm1.display_all_users()
+    
+    rm1.showAD()
 
     print
     rm2 = Room('rm2')
@@ -269,14 +264,15 @@ def test_chatroom():
     rm2.join(p1)
     p1.say(p3, "It's good to see you here. "+str(p3), rm2)
     rm2.display_all_users()
-    
     rm2.showAD()
+    p1.say(p2, "Can I speek to you? " + str(p2), rm2) # test talking to people not in the same room
 
     print
     p1.say('all', "How are you everyone?", rm1)
     p1.show_all_messages()
     p2.show_all_messages()
-
+    
+    print
     rm1.display_all_messages()
     rm2.display_all_messages()
     
