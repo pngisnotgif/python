@@ -121,21 +121,21 @@ class AdPresenter(object):
 
 class Room(object):
 
-    rooms = 0
+    rooms = 0 # count of rooms(instances)
 
     def __init__(self, rm_name = None):
         'create a room with a name.'
         
         self.rooms += 1
         
-        if not rm_name is None:
+        if not rm_name is None: # room name
             self.name = rm_name
         else:
             self.name = 'rm' + str(self.rooms)
 
-        self.perm = {}
-        self.usrs = []
-        self.ad = AdPresenter()
+        self.perm = {}  # permit list for talking to others
+        self.usrs = []  # user lists of this room
+        self.ad = AdPresenter() # ads in this room
 
         print 'Room "%s" is created.'%(rm_name)
         time.sleep(1)
@@ -144,13 +144,15 @@ class Room(object):
         return 'Room %s'%(self.name)
 
     def join(self, user):
+        "a new user joins in this room"
+        
         print "User %s joined in room %s"%(user, self)
         if user not in self.usrs:
             self.usrs.append(user)
         time.sleep(1)
    
     def invite(self, inviter, invitee):
-        "Invite someone to this room"
+        "a user invites someone to this room"
         
         inviter.invite(self.name, invitee)
 
@@ -163,6 +165,8 @@ class Room(object):
         self.join(invitee)  # add invitee to user list
 
     def get_permission(self, user1, user2):
+        "Check if user1 has permission talking with user2"
+        
         if user1 in self.perm.keys() or user2 in self.perm.keys():
             return True
         else:
@@ -178,6 +182,8 @@ class Room(object):
         time.sleep(1)
 
     def broadcast(self, user, words):
+        "User send something too all the other people in this room."
+        
         print 'user %s broadcasting to EVERYONE:'%(user)
         for i in self.usrs:
             if i != user:
@@ -186,6 +192,8 @@ class Room(object):
         time.sleep(1)
 
     def showAD(self):
+        "Show an ad in this room."
+        
         print "AD time in '%s':"%(self),
         self.ad.show()
         time.sleep(1)
