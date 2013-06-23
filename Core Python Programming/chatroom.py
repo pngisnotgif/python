@@ -29,12 +29,11 @@ class User(object):
     '''
         user class
     '''
-    
-    # messages = {} # messages of someone in every room.
 
     def __init__(self, nickname):
         self.name = nickname
-        self.messages = {}
+        self.messages = {} # this is a instance-bound attribute
+        
         print '%s joined in the chatroom.'%(nickname)
         time.sleep(1)
 
@@ -66,6 +65,7 @@ class User(object):
         if room not in self.messages:
             self.messages[room] = []
         self.messages[room].append(msg)
+        
         print "{} says '{}' to {}.".format(self, words, listener)
         time.sleep(1)
         
@@ -79,7 +79,6 @@ class User(object):
         print 'msgs of %s in %s:'%(self, room)
         i = 0
         for msg in self.messages[room]:
-            #if msg.sent == self :
             i += 1
             print '\t',i,':',msg
         time.sleep(1)
@@ -152,10 +151,12 @@ class Room(object):
    
     def invite(self, inviter, invitee):
         "Invite someone to this room"
+        
         inviter.invite(self.name, invitee)
 
     def add_permission(self, inviter, invitee):
         'record accepted permission'
+        
         self.perm[inviter] = invitee
         self.perm[invitee] = inviter
         
@@ -180,8 +181,8 @@ class Room(object):
         print 'user %s broadcasting to EVERYONE:'%(user)
         for i in self.usrs:
             if i != user:
+                # broadcast words should not be new Messages, so say() is not called.
                 print "User %s says %s to %s"%(user, words, i)
-                # user.say(i,words,self)
         time.sleep(1)
 
     def showAD(self):
