@@ -76,7 +76,7 @@ class User(object):
         'show messages in specified room'
         assert room in self.messages
 
-        print 'msgs of %s in %s:'%(self, room)
+        print '  msgs of %s in %s:'%(self, room)
         i = 0
         for msg in self.messages[room]:
             i += 1
@@ -172,7 +172,23 @@ class Room(object):
         else:
             return False        
     
-    def display_all_messages(self):pass # should list in time order
+    def display_all_messages(self):
+        "Display all messages in this room according to time order."
+
+        print "Messages in %s:"%(self)
+        
+        msgs = []
+
+        # search messages from user's message dictionary in this room
+        for user in self.usrs:
+            if self in user.messages:       # only messages in this room
+                for m in user.messages[self]: # extract message
+                    msgs.append(m)
+
+        # print in time order
+        for m in sorted(msgs, key=lambda x:x.time):
+            t = time.ctime(m.time).split()[3] # extract time from timestamp
+            print t,m
 
     def display_all_users(self):
         print 'Users in %s: '%(self),
@@ -260,6 +276,9 @@ def test_chatroom():
     p1.say('all', "How are you everyone?", rm1)
     p1.show_all_messages()
     p2.show_all_messages()
+
+    rm1.display_all_messages()
+    rm2.display_all_messages()
     
 
 if __name__=='__main__':
