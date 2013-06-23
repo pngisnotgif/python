@@ -8,14 +8,16 @@ class Message(object):
         message class
     '''
 
-    def __init__(self, rec, msg=None):
+    def __init__(self, sent, rec, msg=None):
         self.msg_str = msg
+        self.sent = sent
         if rec == 'all':
             self.broadcast = True
             self.recipient = 'all'
         else:
             self.broadcast = False
             self.recipient = rec
+        self.time = time.time()
 
     def __str__(self):
         return self.msg_str
@@ -28,25 +30,30 @@ class User(object):
         user class
     '''
     
-    messages = {} # messages of someone in every room.
+    # messages = {} # messages of someone in every room.
 
     def __init__(self, nickname):
         self.name = nickname
+        self.messages = {}
         print '%s joined in the chatroom.'%(nickname)
+        time.sleep(1)
 
     def __str__(self):
         return self.name
     
     def invite(self, room, person):  # invite someone to some room
         print "{} sent invitation to {} for joining '{}'".format(self, person, room)
+        time.sleep(1)
 
     def accept(self, room, inviter): # accept invitation
         print "{} accepted invitation from {} to join '{}'"\
               .format(self, inviter, room)
+        time.sleep(1)
 
     def decline(self, room, inviter):
         print "{} declined invitation from {} to join '{}'"\
               .format(self, inviter, room)
+        time.sleep(1)
 
     def say(self, listener, words, room=None): 
         '''
@@ -55,29 +62,35 @@ class User(object):
             If room is None, chat in current room.
         '''
 
-        msg = Message(msg = words, rec = listener)
+        msg = Message(msg = words, sent = self, rec = listener)
         if room not in self.messages:
             self.messages[room] = []
         self.messages[room].append(msg)
         print "{} says '{}' to {}.".format(self, words, listener)
+        time.sleep(1)
+        
         if listener=='all':
             room.broadcast(self, words)
-
-        # print 'type of msg: %r'%(type(msg))
-        # print 'msg=%s'%msg
 
     def show_messages(self, room):
         'show messages in specified room'
         assert room in self.messages
-        
-        for i,msg in enumerate(self.messages[room]):
+
+        print 'msgs of %s in %s:'%(self, room)
+        i = 0
+        for msg in self.messages[room]:
+            #if msg.sent == self :
+            i += 1
             print '\t',i,':',msg
+        time.sleep(1)
     
     def show_all_messages(self):
         'show messages in every room.'
+
+        print 'msgs of %s in ALL rooms:'%(self)
         for rm in self.messages:
-            print rm, ':'
             self.show_messages(rm)
+        time.sleep(1)
 
 
 class Ad(object):
@@ -126,6 +139,7 @@ class Room(object):
         self.ad = AdPresenter()
 
         print 'Room "%s" is created.'%(rm_name)
+        time.sleep(1)
 
     def __str__(self):
         return 'Room %s'%(self.name)
@@ -134,6 +148,7 @@ class Room(object):
         print "User %s joined in room %s"%(user, self)
         if user not in self.usrs:
             self.usrs.append(user)
+        time.sleep(1)
    
     def invite(self, inviter, invitee):
         "Invite someone to this room"
@@ -159,16 +174,20 @@ class Room(object):
         for user in self.usrs:
             print user,',',
         print
+        time.sleep(1)
 
     def broadcast(self, user, words):
         print 'user %s broadcasting to EVERYONE:'%(user)
         for i in self.usrs:
             if i != user:
-                user.say(i,words,self)
+                print "User %s says %s to %s"%(user, words, i)
+                # user.say(i,words,self)
+        time.sleep(1)
 
     def showAD(self):
         print "AD time in '%s':"%(self),
         self.ad.show()
+        time.sleep(1)
 
     def __del__(self):
         self.rooms -= 1
@@ -190,63 +209,48 @@ def user_random_decision(user1, user2, rm):
 def test_chatroom():
     p1 = User('Jerry')
     p2 = User('Tom')
-
-    time.sleep(1)
     
     rm1 = Room('hello chatroom!')
-
-    time.sleep(1)
-
     rm1.join(p1)    # p1 joined room 'rm1'
     
     rm1.invite(p1, p2)
     user_random_decision(p2, p1, rm1)
     if rm1.get_permission(p1, p2):
         p1.say(p2,"Hello "+str(p2),rm1)
-        time.sleep(1)
         p2.say(p1, "Hi,"+str(p1),rm1)
-        time.sleep(1)
 
-        # p1.show_messages(rm1)
-        # p2.show_messages(rm1)
+        p1.show_messages(rm1)
         p1.show_all_messages()
         rm1.display_all_users()
         
-        time.sleep(1)
         rm1.showAD()
 
     print
-    time.sleep(1)
     p3 = User('Violet')
     rm1.invite(p2,p3)
     user_random_decision(p3, p2, rm1)
     if rm1.get_permission(p1, p2):
         p2.say(p3, "welcome, "+str(p3), rm1)
-        time.sleep(1)
         p3.say(p2, "Thanks for inviting me.", rm1)
 
-        time.sleep(1)
         p2.show_all_messages()
         rm1.display_all_users()
         
-        time.sleep(1)
         rm1.showAD()
 
     print
-    time.sleep(1)
     rm2 = Room('rm2')
     rm2.join(p3)
     rm2.join(p1)
-    time.sleep(1)
     p1.say(p3, "It's good to see you here. "+str(p3), rm2)
     rm2.display_all_users()
     
-    time.sleep(1)
     rm2.showAD()
 
     print
     p1.say('all', "How are you everyone?", rm1)
-    
+    p1.show_all_messages()
+    p2.show_all_messages()
     
 
 if __name__=='__main__':
