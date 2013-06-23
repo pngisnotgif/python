@@ -28,7 +28,7 @@ class User(object):
         user class
     '''
     
-    messages = [] # messages of someone in every room.
+    messages = {} # messages of someone in every room.
 
     def __init__(self, nickname):
         self.name = nickname
@@ -55,17 +55,27 @@ class User(object):
             If room is None, chat in current room.
         '''
 
-        msg = Message(words, listener)
-        self.messages.append(msg)
+        msg = Message(msg = words, rec = listener)
+        if room not in self.messages:
+            self.messages[room] = []
+        self.messages[room].append(msg)
         print "{} says '{}' to {}.".format(self, words, listener)
-        print 'type of msg: %r'%(type(msg))
-        print 'msg=%s'%msg.show()
+
+        # print 'type of msg: %r'%(type(msg))
+        # print 'msg=%s'%msg
 
     def show_messages(self, room):
-        for msg in self.messages:
-            print msg.show()
+        'show messages in specified room'
+        assert room in self.messages
+        
+        for i,msg in enumerate(self.messages[room]):
+            print '\t',i,':',msg
     
-    def show_all_messages(self):pass
+    def show_all_messages(self):
+        'show messages in every room.'
+        for rm in self.messages:
+            print rm, ':'
+            self.show_messages(rm)
 
 
 class Ad(object):
@@ -102,7 +112,7 @@ class Room(object):
         return 'Room %s'%(self.name)
    
     def invite(self, inviter, invitee):
-        # invite someone to this room
+        "Invite someone to this room"
         inviter.invite(self.name, invitee)
 
     def add_permission(self, inviter, invitee):
@@ -148,13 +158,14 @@ def test_chatroom():
     rm1.invite(p1, p2)
     user_random_decision(p1, p2, rm1)
     if rm1.get_permission(p1, p2):
-        p1.say(p2,"Hello "+str(p2))
+        p1.say(p2,"Hello "+str(p2),rm1)
         time.sleep(1)
-        p2.say(p1, "Hi,"+str(p1))
+        p2.say(p1, "Hi,"+str(p1),rm1)
         time.sleep(1)
 
-        p1.show_messages(rm1)
-        p2.show_messages(rm1)
+        # p1.show_messages(rm1)
+        # p2.show_messages(rm1)
+        p1.show_all_messages()
 
  
     
