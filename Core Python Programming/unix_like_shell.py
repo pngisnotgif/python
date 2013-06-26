@@ -5,11 +5,7 @@ import sys
 import os
 
 # TODO: translate cmd args in DOS
-def translate_args(args):
-    return args
-
-def unix_like_shell():
-
+def trans2dos(str_in):
     unix2dos_cmd_dict = {
         'ls':'dir',
         'more':'more',
@@ -18,7 +14,28 @@ def unix_like_shell():
         'mv':'ren',
         'rm':'del'
         }
+
+    c_list = str_in.split()
+    cmd = c_list[0]
+    args = c_list[1:]
+
+    if cmd in unix2dos_cmd_dict.keys():
+        dos_cmd = unix2dos_cmd_dict[cmd]
+    else:
+        dos_cmd = cmd
+
+    # TODO: translate args
+    if cmd == 'ls':
+        pass
+        
+    cmdline = dos_cmd + ' '.join(args)
+   
+    if cmd not in unix2dos_cmd_dict.keys():
+        print 'Bad command for %s'%(str_in) 
     
+    return cmdline
+
+def unix_like_shell():
     platform = sys.platform
     if platform == 'darwin':
         is_unix_shell = True
@@ -27,22 +44,18 @@ def unix_like_shell():
 
     while True:
         try:
-            str_in = raw_input('>>>').split()
-            cmd = str_in[0]
-            args = str_in[1:]
-            
-            if cmd=='exit':
+            cmd = raw_input('>>> ')
+ 
+            if cmd.split()[0] in ('exit', 'quit'):
                 raise KeyboardInterrupt
 
             if platform in ('win32','dos'):
-                dos_cmd = unix2dos_cmd_dict[cmd]
-                dos_args = translate_args(args)
-                cmdline = dos_cmd + dos_args
+                cmdline = trans2dos(cmd)
             elif is_unix_shell:
-                cmdline = cmd + ' '.join(args)
-
+                cmdline = cmd
             print cmdline
-            os.system(cmdline)  # how to delete cmd string when executing?
+            
+            os.system(cmdline)  # call system cmd
             
         except (KeyboardInterrupt, EOFError):
             break
