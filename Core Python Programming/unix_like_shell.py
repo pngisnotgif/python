@@ -4,7 +4,6 @@
 import sys
 import os
 
-# TODO: translate cmd args in DOS
 def trans2dos(str_in):
     unix2dos_cmd_dict = {
         'ls':'dir',
@@ -23,14 +22,17 @@ def trans2dos(str_in):
         dos_cmd = unix2dos_cmd_dict[cmd]
     else:
         dos_cmd = cmd
-    
-    if args == '--help':
-        dos_args = ' /?'
-    else:
-        dos_args = args # TODO: deal with every cmd
+
+    dos_args = args
+    if len(args)>=1:
+        if args[0] == '--help':
+            dos_args = [' /?']
+            print 'dos'
+        # TODO: deal with every cmd
         
-    cmdline = dos_cmd + ' '.join(dos_args)
-   
+    cmdline = dos_cmd + ' ' + ' '.join(dos_args)
+
+    # print 'cmdline=',cmdline
     if cmd not in unix2dos_cmd_dict.keys():
         print 'Bad command for %s'%(str_in) 
     
@@ -54,7 +56,6 @@ def unix_like_shell():
                 cmdline = trans2dos(cmd)
             elif is_unix_shell:
                 cmdline = cmd
-            print cmdline
             
             os.system(cmdline)  # call system cmd
             
