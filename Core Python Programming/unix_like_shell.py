@@ -23,12 +23,13 @@ def trans2dos(str_in):
         dos_cmd = unix2dos_cmd_dict[cmd]
     else:
         dos_cmd = cmd
-
-    # TODO: translate args
-    if cmd == 'ls':
-        pass
+    
+    if args == '--help':
+        dos_args = ' /?'
+    else:
+        dos_args = args # TODO: deal with every cmd
         
-    cmdline = dos_cmd + ' '.join(args)
+    cmdline = dos_cmd + ' '.join(dos_args)
    
     if cmd not in unix2dos_cmd_dict.keys():
         print 'Bad command for %s'%(str_in) 
@@ -59,6 +60,8 @@ def unix_like_shell():
             
         except (KeyboardInterrupt, EOFError):
             break
+        except IndexError:
+            pass
 
 if __name__=='__main__':
     unix_like_shell()
