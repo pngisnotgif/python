@@ -71,9 +71,10 @@ def test_ex15_18():
         if time_int:
             t = ctime( float(time_int.group(1)) )
             t_from_file = match_line(line, 1)
+            # print t,t_from_file
             if t_from_file:
-                if t == t_from_file:
-                    # print 'PASS!'
+                if t == t_from_file:    # TODO: not works in mac: day without leading 0 pads
+                    # print 'PASS!'     # because redata.txt is generated in windows
                     pass
                 else:
                     isTestPassed = False    # ???? How to break to outmost here? 
@@ -154,6 +155,26 @@ def test_ex15_25():
         except AttributeError:
             print 'login or domain not found.'    
 
+def test_ex15_26():
+    r = '\w+@\w+\.\w+'  # the string that matches in the string
+    myemail = 'pngisnotgif@qq.com'
+    newfile = open('redata_new.txt','w')
+    for line in f.readlines():
+        newline = re.sub(r, myemail, line)
+        if newline:
+            # print newline,
+            newfile.write(newline)
+    newfile.close()
+            
+def test_ex15_27():
+    r = r'\w{3}\s(\w{3})\s(\d{2}).+(\d{4})'
+    for line in f.readlines():
+        timestamp = match_line(line, 1)
+        try:
+            month, day, year = re.match(r, timestamp).group(1, 2, 3)
+            print '{} {}, {}'.format(month, day, year)
+        except AttributeError:
+            print 'timestamp not found.' 
     
 def get_test_defs():
     '''
@@ -205,3 +226,4 @@ if __name__=='__main__':
     with open(filename) as f:
         run_last_tests()
         # run_all_tests()
+        # test_ex15_18()
